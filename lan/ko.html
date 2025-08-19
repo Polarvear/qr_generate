@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <!-- ✅ SEO 기본 메타: 한국어 대상 / 다크모드 미지원 / 완전 정적 사이트 -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fast QR — 무료 QR 코드 생성기 (클라이언트 사이드, 업로드 없음)</title>
+  <meta name="description" content="브라우저에서 바로 QR 코드를 생성하세요. PNG/SVG, 로고 오버레이, 색상, 오류 보정 지원. 100% 클라이언트 사이드로 서버 업로드가 전혀 없습니다." />
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+  <link rel="canonical" href="https://YOUR-DOMAIN.example/" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- ✅ Open Graph / Twitter 카드 (한국어) -->
+  <meta property="og:title" content="Fast QR — 무료 QR 코드 생성기" />
+  <meta property="og:description" content="브라우저에서 오프라인으로 QR 코드를 만드세요. PNG/SVG, 로고, 색상, 오류 보정 지원." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://YOUR-DOMAIN.example/" />
+  <meta property="og:image" content="https://YOUR-DOMAIN.example/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- ✅ 성능 최적화: CDN 사전연결 (외부 스크립트 최소화 권장) -->
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="dns-prefetch" href="https://unpkg.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+
+  <!-- ✅ 구조화 데이터(JSON-LD): WebSite + SearchAction -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Fast QR",
+    "url": "https://YOUR-DOMAIN.example/",
+    "inLanguage": "ko",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://YOUR-DOMAIN.example/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- ✅ 구조화 데이터(JSON-LD): HowTo (QR 생성 절차) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "브라우저에서 QR 코드를 만드는 방법",
+    "inLanguage": "ko",
+    "description": "로고, 색상, 오류 보정을 포함한 QR 코드를 100% 클라이언트 사이드로 생성합니다.",
+    "step": [
+      {"@type":"HowToStep","name":"내용 입력","text":"입력란에 URL 또는 텍스트를 붙여넣습니다."},
+      {"@type":"HowToStep","name":"옵션 설정","text":"색상, 크기, 오류 보정 단계, 로고(선택)를 설정합니다."},
+      {"@type":"HowToStep","name":"생성 및 다운로드","text":"생성 버튼을 누르고 PNG 또는 SVG로 다운로드합니다."}
+    ]
+  }
+  </script>
+
+  <!-- ✅ 구조화 데이터(JSON-LD): FAQPage (핵심 질문 3개) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "inLanguage": "ko",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "제 데이터가 서버로 업로드되나요?",
+        "acceptedAnswer": {"@type": "Answer","text": "아니요. 모든 처리는 브라우저에서만 이루어지며, 데이터 업로드가 없습니다."}
+      },
+      {
+        "@type": "Question",
+        "name": "QR 코드 위에 로고를 넣을 수 있나요?",
+        "acceptedAnswer": {"@type": "Answer","text": "가능합니다. 작은 이미지를 업로드하면 중앙에 적절한 여백과 함께 오버레이됩니다."}
+      },
+      {
+        "@type": "Question",
+        "name": "지원 포맷은 무엇인가요?",
+        "acceptedAnswer": {"@type": "Answer","text": "PNG와 SVG를 지원합니다. 오류 보정(L/M/Q/H) 및 사용자 지정 색상도 설정할 수 있습니다."}
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    /* =============================
+       ✅ 초경량 CSS (다크모드 미지원)
+       - 접근성 고려 콘트라스트 / 반응형 레이아웃
+       - 외부 폰트 미사용 → 성능 최적화
+       ============================= */
+    :root { --brand:#0ea5e9; --ink:#0a0a0a; --muted:#6b7280; --bg:#ffffff; --card:#f8fafc; --line:#e5e7eb; }
+    html,body{height:100%;}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#fff;color:var(--ink);}
+    a{color:var(--brand);text-decoration:none}
+    header{border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:10}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand h1{font-size:20px;line-height:1.1;margin:0}
+    .tag{font-size:12px;color:var(--muted)}
+
+    main .grid{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-top:16px}
+    @media (max-width: 900px){ main .grid{grid-template-columns:1fr;} }
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+    .title{font-size:18px;margin:0 0 8px}
+    .sub{font-size:13px;color:var(--muted);margin:0 0 16px}
+
+    label{display:block;font-size:13px;margin:12px 0 6px}
+    input[type="text"], textarea, select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:14px}
+    input[type="color"]{height:36px;width:56px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff}
+    input[type="file"]{font-size:13px}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .grow{flex:1}
+    .btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .muted{color:var(--muted);font-size:12px}
+
+    .preview{display:flex;flex-direction:column;align-items:center;gap:12px}
+    #qr-canvas-wrap{width:100%;display:flex;justify-content:center;align-items:center;min-height:320px;background:#fff;border:1px dashed var(--line);border-radius:12px}
+    #qr-target{display:inline-block}
+
+    .ads{display:grid;grid-template-columns:1fr;gap:12px}
+    .ad-box{background:#fff;border:1px dashed var(--line);border-radius:12px;min-height:280px;display:flex;align-items:center;justify-content:center}
+    .ad-box.small{min-height:180px}
+
+    .help h2{font-size:18px;margin:24px 0 8px}
+    .help p, .help li{font-size:14px;line-height:1.6}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef2ff;border:1px solid #c7d2fe;border-radius:6px;padding:0 6px}
+    footer{border-top:1px solid var(--line);margin-top:24px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap brand" role="banner">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 3h8v8H3V3zm2 2v4h4V5H5zm6 0h2v2h-2V5zm4 0h6v6h-6V5zm2 2v2h2V7h-2zM3 13h2v2H3v-2zm4 0h4v4H7v-4zm-4 6h6v2H3v-2zm10-6h8v8h-8v-8zm2 2v4h4v-4h-4z"/></svg>
+      <h1>Fast QR</h1>
+      <span class="tag">클라이언트 사이드 QR 생성기 (PNG/SVG, 로고, 색상)</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid" aria-live="polite">
+      <!-- =============================
+           좌측: 옵션 사이드바
+           (UI 텍스트 한국어 / 주석 한국어)
+           ============================= -->
+      <section class="card" aria-label="QR 옵션">
+        <h2 class="title">옵션</h2>
+        <p class="sub">모든 처리는 브라우저에서만 실행됩니다. 업로드 없음.</p>
+
+        <label for="data-input">내용 (URL 또는 텍스트)</label>
+        <textarea id="data-input" rows="3" placeholder="https://example.com"></textarea>
+
+        <div class="row">
+          <div class="grow">
+            <label for="fg">전경색</label>
+            <input type="color" id="fg" value="#000000" />
+          </div>
+          <div class="grow">
+            <label for="bg">배경색</label>
+            <input type="color" id="bg" value="#ffffff" />
+          </div>
+          <div>
+            <label for="ecc">오류 보정</label>
+            <select id="ecc">
+              <option value="L">L (7%)</option>
+              <option value="M" selected>M (15%)</option>
+              <option value="Q">Q (25%)</option>
+              <option value="H">H (30%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="grow">
+            <label for="size">크기 (px)</label>
+            <input type="range" id="size" min="128" max="1024" value="384" />
+            <div class="muted" id="size-read">384px</div>
+          </div>
+          <div>
+            <label for="margin">여백</label>
+            <input type="number" id="margin" min="0" max="24" value="8" />
+          </div>
+          <div>
+            <label for="fmt">포맷</label>
+            <select id="fmt">
+              <option value="png" selected>PNG</option>
+              <option value="svg">SVG</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="logo">로고 오버레이(선택)</label>
+        <input type="file" id="logo" accept="image/*" />
+        <div class="row"><button class="btn" id="btn-clear-logo" type="button">로고 제거</button></div>
+
+        <!-- ✅ Turnstile: 봇 방지(서버 검증 없이 UI Gate 용도). 실제 프로덕션에서는 서버측 검증 추가 권장 -->
+        <div style="margin-top:12px">
+          <div id="turnstile" class="cf-turnstile" data-sitekey="__YOUR_TURNSTILE_SITEKEY__" data-callback="onTurnstileSuccess"></div>
+          <div class="muted" id="turnstile-status" aria-live="polite">생성 버튼을 활성화하려면 인증이 필요합니다.</div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button id="btn-generate" class="btn primary" type="button" disabled>생성</button>
+          <button id="btn-download" class="btn" type="button" disabled>다운로드</button>
+          <button id="btn-copy-svg" class="btn" type="button" disabled>SVG 복사</button>
+        </div>
+        <p class="muted">본 도구를 사용하면 <a href="#privacy">개인정보 처리</a>에 동의한 것으로 간주됩니다.</p>
+
+        <hr style="margin:16px 0;border:none;border-top:1px solid var(--line)" />
+
+        <!-- ✅ UTM 빌더: 롱테일 유입을 위한 보조 도구 -->
+        <h3 class="title" style="font-size:16px">UTM 빌더</h3>
+        <label for="utm-base">기본 URL</label>
+        <input type="text" id="utm-base" placeholder="https://example.com/landing" />
+        <div class="row">
+          <input class="grow" id="utm-source" placeholder="utm_source (예: newsletter)" />
+          <input class="grow" id="utm-medium" placeholder="utm_medium (예: email)" />
+        </div>
+        <div class="row">
+          <input class="grow" id="utm-campaign" placeholder="utm_campaign (예: summer_sale)" />
+          <input class="grow" id="utm-term" placeholder="utm_term (선택)" />
+        </div>
+        <div class="row">
+          <input class="grow" id="utm-content" placeholder="utm_content (선택)" />
+          <button class="btn" id="utm-build" type="button">빌드</button>
+        </div>
+        <div class="row">
+          <input class="grow" id="utm-result" placeholder="완성된 URL이 여기에 표시됩니다" readonly />
+          <button class="btn" id="utm-use" type="button">QR에 적용</button>
+        </div>
+
+        <hr style="margin:16px 0;border:none;border-top:1px solid var(--line)" />
+
+        <!-- ✅ vCard/MeCard 템플릿: 버튼 클릭 시 입력 필드에 자동 삽입 -->
+        <h3 class="title" style="font-size:16px">빠른 템플릿</h3>
+        <div class="row">
+          <button class="btn" data-template="vcard">vCard</button>
+          <button class="btn" data-template="mecard">MeCard</button>
+          <button class="btn" data-template="wifi">Wi‑Fi</button>
+        </div>
+        <p class="muted">예시이므로 생성 전 본인 정보로 바꿔주세요.</p>
+      </section>
+
+      <!-- =============================
+           우측: 미리보기 + 광고 (지연 로딩)
+           ============================= -->
+      <section class="card" aria-label="미리보기 및 광고">
+        <h2 class="title">미리보기</h2>
+        <div id="qr-canvas-wrap" class="preview">
+          <div id="qr-target" aria-label="QR 코드 미리보기"></div>
+        </div>
+        <div class="row" style="justify-content:center">
+          <span class="muted">팁: 명암 대비가 높을수록 스캔 성공률이 좋아집니다.</span>
+        </div>
+
+        <h3 class="title" style="margin-top:16px">스폰서</h3>
+        <div class="ads">
+          <!-- ✅ 광고 슬롯: ATF 과밀 피함 → 미리보기 아래/사이드에 배치, IntersectionObserver로 지연 로딩 -->
+          <div class="ad-box ad-slot" data-slot="1234567890">
+            <ins class="adsbygoogle" style="display:block;height:280px;width:100%" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="1234567890" data-full-width-responsive="true"></ins>
+          </div>
+          <div class="ad-box small ad-slot" data-slot="0987654321">
+            <ins class="adsbygoogle" style="display:block;height:180px;width:100%" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="0987654321" data-full-width-responsive="true"></ins>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =============================
+         롱테일용 도움말 콘텐츠(Helpful Content 원칙)
+         ============================= -->
+    <section class="card help" id="use-cases">
+      <h2>QR 코드 활용 사례 & 바로 복사 템플릿</h2>
+      <ul>
+        <li><strong>명함</strong> — 연락처를 즉시 공유합니다.
+          <div><span class="kbd">vCard</span> 예시:<br>
+            <code>BEGIN:VCARD\nVERSION:3.0\nN:홍;길동;;;\nFN:홍길동\nORG:Acme Inc\nTITLE:마케팅 리드\nTEL;TYPE=CELL:+82-10-1234-5678\nEMAIL:gildong@example.com\nURL:https://acme.example\nEND:VCARD</code>
+          </div>
+        </li>
+        <li><strong>레스토랑 메뉴</strong> — 메뉴 페이지 또는 PDF로 연결합니다.</li>
+        <li><strong>쿠폰 & 캠페인</strong> — 상단의 <em>UTM 빌더</em>로 클릭 추적이 가능한 링크를 만드세요.</li>
+      </ul>
+    </section>
+
+    <section class="card help" id="guides">
+      <h2>미니 가이드</h2>
+      <h3>동적 vCard / MeCard</h3>
+      <p>언제든 수정 가능한 소형 랜딩 페이지를 따로 호스팅한 뒤, 해당 URL을 QR로 인코딩하세요. 인쇄물을 새로 만들지 않고도 정보 변경이 가능합니다.</p>
+      <h3>UTM 베스트 프랙티스</h3>
+      <ul>
+        <li>일관성을 위해 소문자와 <span class="kbd">snake_case</span> 사용을 권장합니다.</li>
+        <li>캠페인 이름은 짧고 의미 있게(예: <span class="kbd">back_to_school</span>).</li>
+      </ul>
+    </section>
+
+    <section class="card help" id="privacy">
+      <h2>개인정보 처리</h2>
+      <p><strong>사용자 콘텐츠는 업로드되지 않습니다.</strong> 모든 생성 작업은 브라우저에서만 수행됩니다. 로고 이미지도 로컬에서만 처리됩니다.</p>
+    </section>
+
+    <footer class="wrap">
+      <p class="muted">© <span id="year"></span> Fast QR • <a href="#privacy">개인정보 처리</a></p>
+    </footer>
+  </main>
+
+  <!-- ✅ Cloudflare Turnstile (UI 게이트용) -->
+  <script>
+    // 한국어 주석: Turnstile 토큰을 UI Gate로 활용(실 서비스는 서버 검증 권장)
+    window.turnstileToken = null;
+    function onTurnstileSuccess(token){
+      window.turnstileToken = token;
+      const btn = document.getElementById('btn-generate');
+      btn.disabled = false; // 토큰 발급 시 생성 버튼 활성화
+      document.getElementById('turnstile-status').textContent = '인증 완료. 이제 생성할 수 있습니다.';
+    }
+    function onTurnstileLoad(){ /* 자동 렌더링(속성 기반) */ }
+  </script>
+  <script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad"></script>
+
+  <!-- ✅ 앱 로직: ESM + 동적 폴리필/대체 로더(초경량) -->
+  <script type="module">
+    // =============================
+    // 한국어 주석: QR 생성기 메인 스크립트
+    // - 1차: qr-code-styling (로고 오버레이 지원)
+    // - 2차 폴백: qrcode (로고는 수동 캔버스 오버레이)
+    // =============================
+
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    const els = {
+      data: $('#data-input'), fg: $('#fg'), bg: $('#bg'), ecc: $('#ecc'),
+      size: $('#size'), sizeRead: $('#size-read'), margin: $('#margin'), fmt: $('#fmt'),
+      logo: $('#logo'), clearLogo: $('#btn-clear-logo'),
+      gen: $('#btn-generate'), dl: $('#btn-download'), copySvg: $('#btn-copy-svg'),
+      target: $('#qr-target'),
+      utm: { base: $('#utm-base'), source: $('#utm-source'), medium: $('#utm-medium'), campaign: $('#utm-campaign'), term: $('#utm-term'), content: $('#utm-content'), build: $('#utm-build'), result: $('#utm-result'), use: $('#utm-use') }
+    };
+
+    // 연도 표시
+    $('#year').textContent = new Date().getFullYear();
+
+    // 사이즈 표시 동기화
+    els.size.addEventListener('input', () => els.sizeRead.textContent = els.size.value + 'px');
+
+    // 로고 파일 → DataURL 변환
+    let logoDataURL = null;
+    els.logo.addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      logoDataURL = await fileToDataURL(file);
+    });
+    els.clearLogo.addEventListener('click', () => { logoDataURL = null; els.logo.value = '' });
+
+    function fileToDataURL(file){
+      return new Promise((resolve,reject)=>{
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+      });
+    }
+
+    // 템플릿 버튼들
+    $$('button[data-template]').forEach(btn => btn.addEventListener('click', () => {
+      const type = btn.getAttribute('data-template');
+      if (type === 'vcard') {
+        els.data.value = `BEGIN:VCARD\nVERSION:3.0\nN:홍;길동;;;\nFN:홍길동\nORG:Acme Inc\nTITLE:마케팅 리드\nTEL;TYPE=CELL:+82-10-1234-5678\nEMAIL:gildong@example.com\nURL:https://acme.example\nEND:VCARD`;
+      } else if (type === 'mecard') {
+        els.data.value = `MECARD:N:Hong,Gildong;TEL:+82-10-1234-5678;EMAIL:gildong@example.com;URL:https://acme.example;NOTE:Hello;;`;
+      } else if (type === 'wifi') {
+        els.data.value = `WIFI:T:WPA;S:MyWiFi;P:MyPassword;H:false;`;
+      }
+    }));
+
+    // UTM 빌더
+    els.utm.build.addEventListener('click', () => {
+      const base = els.utm.base.value || 'https://example.com/';
+      let u; try { u = new URL(base); } catch { alert('올바른 URL을 입력하세요.'); return; }
+      setIf(els.utm.source.value, 'utm_source');
+      setIf(els.utm.medium.value, 'utm_medium');
+      setIf(els.utm.campaign.value, 'utm_campaign');
+      setIf(els.utm.term.value, 'utm_term');
+      setIf(els.utm.content.value, 'utm_content');
+      els.utm.result.value = u.toString();
+      function setIf(v, k){ if(v) u.searchParams.set(k, v); }
+    });
+    els.utm.use.addEventListener('click', () => {
+      if (els.utm.result.value) els.data.value = els.utm.result.value;
+    });
+
+    // 광고 스크립트 지연 로딩 (IntersectionObserver)
+    const adSlots = $$('.ad-slot');
+    let adsScriptLoaded = false;
+    const adIO = new IntersectionObserver((entries)=>{
+      if (entries.some(e=>e.isIntersecting)) {
+        loadAds(); adIO.disconnect();
+      }
+    }, { rootMargin: '300px' });
+    adSlots.forEach(el => adIO.observe(el));
+
+    function loadAds(){
+      if (adsScriptLoaded) return; adsScriptLoaded = true;
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX'; // 본인 AdSense client로 교체
+      s.crossOrigin = 'anonymous';
+      s.onload = () => {
+        // 각 슬롯 활성화
+        $$('.adsbygoogle').forEach(() => (window.adsbygoogle = window.adsbygoogle || []).push({}));
+      };
+      document.head.appendChild(s);
+    }
+
+    // QR 엔진: 1) qr-code-styling 로드 시도 → 실패 시 2) qrcode 폴백
+    let engine = null; // { type: 'styling'|'fallback', instance: any }
+
+    async function ensureEngine(){
+      if (engine) return engine;
+      try {
+        const mod = await import('https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js');
+        const QRCodeStyling = mod.default || mod;
+        const inst = new QRCodeStyling({
+          width: 384,
+          height: 384,
+          data: 'https://example.com',
+          dotsOptions: { color: '#000000' },
+          backgroundOptions: { color: '#ffffff' },
+          imageOptions: { crossOrigin: 'anonymous', margin: 6 }
+        });
+        engine = { type: 'styling', instance: inst };
+      } catch (e) {
+        // 폴백: qrcode 라이브러리 로드
+        await loadScript('https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js');
+        engine = { type: 'fallback', instance: window.QRCode };
+      }
+      return engine;
+    }
+
+    function loadScript(src){
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script'); s.src = src; s.async = true;
+        s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
+      });
+    }
+
+    async function renderQR(){
+      const text = els.data.value.trim();
+      if (!text) { alert('내용을 입력하세요.'); return; }
+
+      const size = parseInt(els.size.value,10);
+      const fg = els.fg.value; const bg = els.bg.value;
+      const ecc = els.ecc.value; const margin = parseInt(els.margin.value,10);
+      const fmt = els.fmt.value; // png|svg
+
+      const eng = await ensureEngine();
+      els.target.innerHTML = ''; // reset
+
+      if (eng.type === 'styling') {
+        const inst = eng.instance;
+        // 로고 적용: 데이터 URL 또는 null
+        inst.update({
+          width: size, height: size,
+          data: text,
+          image: logoDataURL || undefined,
+          dotsOptions: { color: fg },
+          backgroundOptions: { color: bg },
+          qrOptions: { errorCorrectionLevel: ecc },
+          imageOptions: { crossOrigin: 'anonymous', margin: 6 }
+        });
+        inst.append(els.target);
+        // 다운로드/복사 핸들러 갱신
+        els.dl.onclick = () => inst.download({ name: 'qr', extension: fmt });
+        els.copySvg.onclick = async () => {
+          if (fmt !== 'svg') { alert('SVG 복사를 사용하려면 포맷을 SVG로 변경하세요.'); return; }
+          const blob = await inst.getRawData('svg');
+          const text = await blob.text();
+          await navigator.clipboard.writeText(text);
+          alert('SVG가 클립보드에 복사되었습니다.');
+        };
+      } else {
+        // 폴백 엔진: qrcode (캔버스)
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = size;
+        els.target.appendChild(canvas);
+        await window.QRCode.toCanvas(canvas, text, {
+          errorCorrectionLevel: ecc,
+          margin,
+          color: { dark: fg, light: bg.replace('#','') === 'ffffff' ? '#ffffff' : bg }
+        });
+        if (logoDataURL) {
+          const ctx = canvas.getContext('2d');
+          const img = new Image(); img.crossOrigin = 'anonymous'; img.src = logoDataURL;
+          await img.decode();
+          const s = Math.round(size * 0.2); // 로고 크기: QR 20%
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, (size - s)/2, (size - s)/2, s, s);
+        }
+        els.dl.onclick = () => {
+          const link = document.createElement('a');
+          link.download = 'qr.png'; link.href = canvas.toDataURL('image/png'); link.click();
+        };
+        els.copySvg.onclick = async () => {
+          const svg = await window.QRCode.toString(text, { type: 'svg', errorCorrectionLevel: ecc, margin });
+          await navigator.clipboard.writeText(svg);
+          alert('SVG가 클립보드에 복사되었습니다.');
+        };
+      }
+
+      els.dl.disabled = false;
+      els.copySvg.disabled = false;
+    }
+
+    // 생성 버튼
+    els.gen.addEventListener('click', async () => {
+      if (!window.turnstileToken) { alert('인증을 완료해 주세요.'); return; }
+      await renderQR();
+    });
+
+  </script>
+
+  <!-- ✅ 보조 스크립트: 작은 상호작용들 (모듈 밖) -->
+  <script>
+    // 접근성·UX 보완 (Ctrl/⌘+Enter로 생성, 폼 제출 방지 등)
+    document.getElementById('data-input').addEventListener('keydown', (e)=>{
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault(); document.getElementById('btn-generate').click();
+      }
+    });
+  </script>
+
+  <!-- ✅ No-JS 대체 텍스트 -->
+  <noscript>
+    <div class="wrap" style="margin-top:12px">
+      <div class="card">
+        이 도구는 브라우저에서 QR 코드를 생성하기 위해 JavaScript가 필요합니다. JavaScript를 활성화해 주세요.
+      </div>
+    </div>
+  </noscript>
+</body>
+</html>
